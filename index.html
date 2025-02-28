@@ -1,4 +1,3 @@
-!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -26,11 +25,14 @@
       color: #33495e;
       width: 100%;
       text-align: center;
-      animation: rotateText 2s linear infinite;
+      animation: moveInCircle 2s linear infinite;
     }
-    @keyframes rotateText {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
+    @keyframes moveInCircle {
+      0%   { transform: translate(50px, 0px); }
+      25%  { transform: translate(100px, 50px); }
+      50%  { transform: translate(50px, 100px); }
+      75%  { transform: translate(0px, 50px); }
+      100% { transform: translate(50px, 0px); }
     }
     .check {
       display: none;
@@ -58,7 +60,7 @@
       const loadingText = document.getElementById('loading');
       const message = document.getElementById('message');
 
-      // Hide rotating text
+      // Hide moving text
       loadingText.style.display = "none";
 
       // Show "See results below"
