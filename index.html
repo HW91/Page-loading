@@ -23,16 +23,16 @@
       font-size: 16px;
       font-weight: bold;
       color: #33495e;
-      width: 100%;
-      text-align: center;
-      animation: moveInCircle 2s linear infinite;
+      white-space: nowrap;
+      transform-origin: center;
+      animation: snakeMotion 3s linear infinite;
     }
-    @keyframes moveInCircle {
-      0%   { transform: translate(50px, 0px); }
-      25%  { transform: translate(100px, 50px); }
-      50%  { transform: translate(50px, 100px); }
-      75%  { transform: translate(0px, 50px); }
-      100% { transform: translate(50px, 0px); }
+    @keyframes snakeMotion {
+      0%   { transform: rotate(0deg) translate(50px) rotate(0deg); }
+      25%  { transform: rotate(90deg) translate(50px) rotate(-90deg); }
+      50%  { transform: rotate(180deg) translate(50px) rotate(-180deg); }
+      75%  { transform: rotate(270deg) translate(50px) rotate(-270deg); }
+      100% { transform: rotate(360deg) translate(50px) rotate(-360deg); }
     }
     .check {
       display: none;
