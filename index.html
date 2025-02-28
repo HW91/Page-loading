@@ -7,6 +7,7 @@
     body {
       background: white;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
@@ -47,6 +48,14 @@
       from { stroke-dashoffset: 57; opacity: 0; }
       to   { stroke-dashoffset: 0; opacity: 1; }
     }
+    /* Message styling */
+    #message {
+      display: none;
+      font-family: sans-serif;
+      color: #33495e; /* Set text color to #33495e */
+      font-size: 16px;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -56,12 +65,14 @@
     <!-- Check mark: initially hidden -->
     <path id="checkmark" class="check" d="M30 50 L45 65 L70 40" stroke-dasharray="57" stroke-dashoffset="57"/>
   </svg>
+  <p id="message">See results below</p>
 
   <script>
-    // Function to stop the spinner, draw the check mark, and then redirect.
+    // Function to stop the spinner, draw the check mark, display the message, and then redirect.
     function stopAnimationAndRedirect() {
       const spinner = document.getElementById('spinner');
       const checkmark = document.getElementById('checkmark');
+      const message = document.getElementById('message');
       
       // Stop spinner rotation and optionally hide it.
       spinner.classList.remove('spinning');
@@ -70,10 +81,15 @@
       // Animate the check mark drawing.
       checkmark.style.animation = 'drawCheck 0.5s forwards';
       
-      // After a short delay, redirect to your URL.
+      // After the check mark animation completes, show the message.
+      setTimeout(() => {
+        message.style.display = 'block';
+      }, 500); // Adjust delay as needed
+      
+      // After a further delay, redirect to your URL.
       setTimeout(() => {
         window.location.href = "https://forms.nomadbackoffice.com/xoo/form/ResumeScreener1/formperma/9jrDAuvE_11ujcnN38dd5fR7a-rwsJ7domYUw17joBg";
-      }, 1000); // 1-second delay; adjust as needed.
+      }, 3500); // Total delay (0.5s + 3s) before redirecting; adjust as needed.
     }
 
     // Poll a status endpoint every few seconds until the webhook indicates "complete".
@@ -82,7 +98,7 @@
         fetch('https://hook.us1.make.com/jww4g7mnladsf1zyr5y20uyfnupjx8r5')
           .then(response => response.json())
           .then(data => {
-            // Expecting a JSON response like { status: "complete" }.
+            // Expecting a JSON response like { status: "complete" }
             if (data.status === "complete") {
               clearInterval(intervalId);
               stopAnimationAndRedirect();
