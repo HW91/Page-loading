@@ -17,28 +17,12 @@
       width: 150px;
       height: 150px;
     }
-    .loading-text {
+    .loading-text span {
       position: absolute;
       font-family: sans-serif;
-      font-size: 16px;
+      font-size: 20px; /* Increased by 4px */
       font-weight: bold;
       color: #33495e;
-      white-space: nowrap;
-      transform-origin: center;
-      animation: snakeMotion 3s linear infinite;
-    }
-    @keyframes snakeMotion {
-      0%   { transform: rotate(0deg) translate(50px) rotate(0deg); }
-      25%  { transform: rotate(90deg) translate(50px) rotate(-90deg); }
-      50%  { transform: rotate(180deg) translate(50px) rotate(-180deg); }
-      75%  { transform: rotate(270deg) translate(50px) rotate(-270deg); }
-      100% { transform: rotate(360deg) translate(50px) rotate(-360deg); }
-    }
-    .check {
-      display: none;
-      font-size: 24px;
-      color: #33495e;
-      font-weight: bold;
     }
     #message {
       display: none;
@@ -50,23 +34,30 @@
   </style>
 </head>
 <body>
-  <div class="loading-container">
-    <div id="loading" class="loading-text">LOADING</div>
+  <div class="loading-container" id="loading">
+    <span>L</span><span>O</span><span>A</span><span>D</span><span>I</span><span>N</span><span>G</span>
   </div>
   <p id="message">See results below</p>
 
   <script>
+    const letters = document.querySelectorAll(".loading-text span");
+    const radius = 50;
+    let angleOffset = 0;
+
+    function animateLoading() {
+      letters.forEach((letter, i) => {
+        let angle = (i * (360 / letters.length) + angleOffset) * (Math.PI / 180);
+        let x = Math.cos(angle) * radius + 50; 
+        let y = Math.sin(angle) * radius + 50;
+        letter.style.transform = `translate(${x}px, ${y}px) rotate(${angleOffset}deg)`;
+      });
+      angleOffset += 4; 
+      requestAnimationFrame(animateLoading);
+    }
+
     function stopAnimationAndRedirect() {
-      const loadingText = document.getElementById('loading');
-      const message = document.getElementById('message');
-
-      // Hide moving text
-      loadingText.style.display = "none";
-
-      // Show "See results below"
-      message.style.display = "block";
-
-      // Redirect after a delay
+      document.getElementById('loading').style.display = "none";
+      document.getElementById('message').style.display = "block";
       setTimeout(() => {
         window.location.href = "https://your-redirect-url.com";
       }, 3000);
@@ -83,10 +74,11 @@
             }
           })
           .catch(error => console.error("Polling error:", error));
-      }, 5000); // Increased polling time to reduce Make.com triggers
+      }, 5000);
     }
 
     window.onload = function() {
+      animateLoading();
       pollWebhookStatus();
     };
   </script>
