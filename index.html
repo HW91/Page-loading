@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Webhook-Controlled Spinner</title>
+  <style>
+    body {
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    svg {
+      width: 200px;
+      height: 200px;
+    }
+    /* Spinner: a partial arc in color #33495e */
+    .circle {
+      fill: none;
+      stroke: #33495e;
+      stroke-width: 6;
+      stroke-linecap: round;
+      transform-origin: 50% 50%;
+      /* Create a partial arc: 80px dash then gap (total circumference ~283) */
+      stroke-dasharray: 80 283;
+      stroke-dashoffset: 0;
+    }
+    /* Animation for infinite rotation */
+    .spinning {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    /* Check mark style and drawing animation */
+    .check {
+      fill: none;
+      stroke: #33495e;
+      stroke-width: 6;
+      stroke-linecap: round;
+      opacity: 0;
+    }
+    @keyframes drawCheck {
+      from { stroke-dashoffset: 57; opacity: 0; }
+      to   { stroke-dashoffset: 0; opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <svg viewBox="0 0 100 100">
+    <!-- Spinner: the arc is visible and spinning initially -->
+    <circle id="spinner" class="circle spinning" cx="50" cy="50" r="45" />
+    <!-- Check mark: initially hidden -->
+    <path id="checkmark" class="check" d="M30 50 L45 65 L70 40" stroke-dasharray="57" stroke-dashoffset="57"/>
+  </svg>
+
+  <script>
+    // Function to stop the spinner, draw the check mark, and then redirect.
+    function stopAnimationAndRedirect() {
+      const spinner = document.getElementById('spinner');
+      const checkmark = document.getElementById('checkmark');
+      
+      // Stop spinner rotation and optionally hide it.
+      spinner.classList.remove('spinning');
+      spinner.style.opacity = 0;
+      
+      // Animate the check mark drawing.
+      checkmark.style.animation = 'drawCheck 0.5s forwards';
+      
+      // After a short delay, redirect to your URL.
+      setTimeout(() => {
+        window.location.href = "https://your-redirect-url.com";
+      }, 1000); // 1-second delay; adjust as needed.
+    }
+
+    // Poll a status endpoint every few seconds until the webhook indicates "complete".
+    function pollWebhookStatus() {
+      const intervalId = setInterval(() => {
+        fetch('https://api.example.com/status')
+          .then(response => response.json())
+          .then(data => {
+            // Expecting a JSON response like { status: "complete" }.
+            if (data.status === "complete") {
+              clearInterval(intervalId);
+              stopAnimationAndRedirect();
+            }
+          })
+          .catch(error => console.error("Polling error:", error));
+      }, 3000); // Poll every 3 seconds; adjust as needed.
+    }
+
+    // Start polling when the page loads.
+    window.onload = function() {
+      pollWebhookStatus();
+    };
+  </script>
+</body>
+</html>
