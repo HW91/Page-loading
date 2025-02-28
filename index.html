@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Webhook-Controlled Spinner</title>
+  <title>Webhook-Controlled Loading Animation</title>
   <style>
     body {
       background: white;
@@ -13,102 +13,77 @@
       height: 100vh;
       margin: 0;
     }
-    svg {
-      width: 200px;
-      height: 200px;
+    .loading-container {
+      position: relative;
+      width: 150px;
+      height: 150px;
     }
-    /* Spinner: a partial arc in color #33495e */
-    .circle {
-      fill: none;
-      stroke: #33495e;
-      stroke-width: 6;
-      stroke-linecap: round;
-      transform-origin: 50% 50%;
-      /* Create a partial arc: 80px dash then gap (total circumference ~283) */
-      stroke-dasharray: 80 283;
-      stroke-dashoffset: 0;
+    .loading-text {
+      position: absolute;
+      font-family: sans-serif;
+      font-size: 16px;
+      font-weight: bold;
+      color: #33495e;
+      width: 100%;
+      text-align: center;
+      animation: rotateText 2s linear infinite;
     }
-    /* Animation for infinite rotation */
-    .spinning {
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
+    @keyframes rotateText {
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
     }
-    /* Check mark style and drawing animation */
     .check {
-      fill: none;
-      stroke: #33495e;
-      stroke-width: 6;
-      stroke-linecap: round;
-      opacity: 0;
+      display: none;
+      font-size: 24px;
+      color: #33495e;
+      font-weight: bold;
     }
-    @keyframes drawCheck {
-      from { stroke-dashoffset: 57; opacity: 0; }
-      to   { stroke-dashoffset: 0; opacity: 1; }
-    }
-    /* Message styling */
     #message {
       display: none;
       font-family: sans-serif;
-      color: #33495e; /* Set text color to #33495e */
+      color: #33495e;
       font-size: 16px;
       margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <svg viewBox="0 0 100 100">
-    <!-- Spinner: the arc is visible and spinning initially -->
-    <circle id="spinner" class="circle spinning" cx="50" cy="50" r="45" />
-    <!-- Check mark: initially hidden -->
-    <path id="checkmark" class="check" d="M30 50 L45 65 L70 40" stroke-dasharray="57" stroke-dashoffset="57"/>
-  </svg>
+  <div class="loading-container">
+    <div id="loading" class="loading-text">LOADING</div>
+  </div>
   <p id="message">See results below</p>
 
   <script>
-    // Function to stop the spinner, draw the check mark, display the message, and then redirect.
     function stopAnimationAndRedirect() {
-      const spinner = document.getElementById('spinner');
-      const checkmark = document.getElementById('checkmark');
+      const loadingText = document.getElementById('loading');
       const message = document.getElementById('message');
-      
-      // Stop spinner rotation and optionally hide it.
-      spinner.classList.remove('spinning');
-      spinner.style.opacity = 0;
-      
-      // Animate the check mark drawing.
-      checkmark.style.animation = 'drawCheck 0.5s forwards';
-      
-      // After the check mark animation completes, show the message.
+
+      // Hide rotating text
+      loadingText.style.display = "none";
+
+      // Show "See results below"
+      message.style.display = "block";
+
+      // Redirect after a delay
       setTimeout(() => {
-        message.style.display = 'block';
-      }, 500); // Adjust delay as needed
-      
-      // After a further delay, redirect to your URL.
-      setTimeout(() => {
-        window.location.href = "https://forms.nomadbackoffice.com/xoo/form/ResumeScreener1/formperma/9jrDAuvE_11ujcnN38dd5fR7a-rwsJ7domYUw17joBg";
-      }, 3500); // Total delay (0.5s + 3s) before redirecting; adjust as needed.
+        window.location.href = "https://your-redirect-url.com";
+      }, 3000);
     }
 
-    // Poll a status endpoint every few seconds until the webhook indicates "complete".
     function pollWebhookStatus() {
       const intervalId = setInterval(() => {
-        fetch('https://hook.us1.make.com/jww4g7mnladsf1zyr5y20uyfnupjx8r5')
+        fetch('https://your-webhook-url.com/status')
           .then(response => response.json())
           .then(data => {
-            // Expecting a JSON response like { status: "complete" }
             if (data.status === "complete") {
               clearInterval(intervalId);
               stopAnimationAndRedirect();
             }
           })
           .catch(error => console.error("Polling error:", error));
-      }, 3000); // Poll every 3 seconds; adjust as needed.
+      }, 5000); // Increased polling time to reduce Make.com triggers
     }
 
-    // Start polling when the page loads.
     window.onload = function() {
       pollWebhookStatus();
     };
