@@ -72,14 +72,14 @@
       
       // After a short delay, redirect to your URL.
       setTimeout(() => {
-        window.location.href = "https://your-redirect-url.com";
+        window.location.href = "https://forms.nomadbackoffice.com/xoo/form/ResumeScreener1/formperma/9jrDAuvE_11ujcnN38dd5fR7a-rwsJ7domYUw17joBg";
       }, 1000); // 1-second delay; adjust as needed.
     }
 
     // Poll a status endpoint every few seconds until the webhook indicates "complete".
     function pollWebhookStatus() {
       const intervalId = setInterval(() => {
-        fetch('https://api.example.com/status')
+        fetch('https://hook.us1.make.com/jww4g7mnladsf1zyr5y20uyfnupjx8r5')
           .then(response => response.json())
           .then(data => {
             // Expecting a JSON response like { status: "complete" }.
