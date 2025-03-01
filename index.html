@@ -67,45 +67,39 @@
     <path id="checkmark" class="check" d="M30 50 L45 65 L70 40" stroke-dasharray="57" stroke-dashoffset="57"/>
     <text id="loading-text" x="50" y="50">Loading...</text>
   </svg>
-  <p id="message">Enter your email to see results below</p>
+  <p id="message">See results below</p>
 
   <script>
-    // Function to stop the animation and redirect when "status": "complete" is received
+    // Function to stop animation and redirect once status is complete
     function stopAnimationAndRedirect() {
-      // Stop the spinner and show the checkmark
       document.getElementById('spinner').classList.remove('spinning');
       document.getElementById('spinner').style.opacity = 0;
       document.getElementById('loading-text').style.opacity = 0;
       document.getElementById('checkmark').style.animation = 'drawCheck 0.5s forwards';
       
-      // Display message
       setTimeout(() => { document.getElementById('message').style.display = 'block'; }, 500);
-      
-      // Redirect to the Zoho form URL after a delay
       setTimeout(() => { window.location.href = "https://forms.nomadbackoffice.com/xoo/form/ResumeScreener1/formperma/9jrDAuvE_11ujcnN38dd5fR7a-rwsJ7domYUw17joBg"; }, 3500);
     }
 
-    // Listen for the webhook response from Make.com
+    // Listen for the webhook response from the second scenario via SSE
     function listenForWebhook() {
-      fetch("https://hook.us1.make.com/jww4g7mnladsf1zyr5y20uyfnupjx8r5", {
-        method: "POST", // Use POST to trigger the webhook
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ "status": "complete" }) // Sending request to check for completion
-      })
-        .then(response => response.json())
-        .then(data => {
-          // Check if the status is complete
-          if (data.status === "complete") {
-            stopAnimationAndRedirect(); // Stop animation and redirect if complete
-          }
-        })
-        .catch(() => {
-          // If an error occurs or no response, don't retry since you're relying on the webhook
-          console.error("Error or no response from the webhook.");
-        });
+      const eventSource = new EventSource("https://hook.us1.make.com/jww4g7mnladsf1zyr5y20uyfnupjx8r5");
+
+      eventSource.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        if (data.status === "complete") {
+          eventSource.close(); // Stop listening for further events
+          stopAnimationAndRedirect();
+        }
+      };
+
+      eventSource.onerror = function() {
+        console.error("EventSource encountered an error.");
+        eventSource.close();
+      };
     }
 
-    window.onload = listenForWebhook; // Start waiting for the webhook response when the page loads
+    window.onload = listenForWebhook;
   </script>
 </body>
 </html>
