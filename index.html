@@ -70,36 +70,38 @@
   <p id="message">See results below</p>
 
   <script>
-    // Function to stop animation and redirect once status is complete
+    let pollInterval; // Global variable for the polling interval
+
+    // Stops the spinner, displays the checkmark and message, then redirects.
     function stopAnimationAndRedirect() {
       document.getElementById('spinner').classList.remove('spinning');
       document.getElementById('spinner').style.opacity = 0;
       document.getElementById('loading-text').style.opacity = 0;
       document.getElementById('checkmark').style.animation = 'drawCheck 0.5s forwards';
-      
       setTimeout(() => { document.getElementById('message').style.display = 'block'; }, 500);
       setTimeout(() => { window.location.href = "https://forms.nomadbackoffice.com/xoo/form/ResumeScreener1/formperma/9jrDAuvE_11ujcnN38dd5fR7a-rwsJ7domYUw17joBg"; }, 3500);
     }
 
-    // Listen for the webhook response from the second scenario via SSE
-    function listenForWebhook() {
-      const eventSource = new EventSource("https://hook.us1.make.com/jww4g7mnladsf1zyr5y20uyfnupjx8r5");
-
-      eventSource.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        if (data.status === "complete") {
-          eventSource.close(); // Stop listening for further events
-          stopAnimationAndRedirect();
-        }
-      };
-
-      eventSource.onerror = function() {
-        console.error("EventSource encountered an error.");
-        eventSource.close();
-      };
+    // Polls the status endpoint for a complete response.
+    function pollStatus() {
+      fetch("https://hook.us1.make.com/jww4g7mnladsf1zyr5y20uyfnupjx8r5", { method: "GET" })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "complete") {
+            clearInterval(pollInterval);
+            stopAnimationAndRedirect();
+          }
+        })
+        .catch(error => console.error("Polling error:", error));
     }
 
-    window.onload = listenForWebhook;
+    window.onload = function() {
+      // Wait 20 seconds before starting polling every 5 seconds.
+      setTimeout(() => {
+        pollStatus(); // First poll after the delay
+        pollInterval = setInterval(pollStatus, 5000);
+      }, 20000);
+    }
   </script>
 </body>
 </html>
