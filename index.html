@@ -17,18 +17,15 @@
       width: 200px;
       height: 200px;
     }
-    /* Spinner: a partial arc in color #33495e */
     .circle {
       fill: none;
       stroke: #33495e;
       stroke-width: 6;
       stroke-linecap: round;
       transform-origin: 50% 50%;
-      /* Create a partial arc: 80px dash then gap (total circumference ~283) */
       stroke-dasharray: 80 283;
       stroke-dashoffset: 0;
     }
-    /* Animation for infinite rotation */
     .spinning {
       animation: spin 1s linear infinite;
     }
@@ -36,7 +33,6 @@
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
     }
-    /* Check mark style and drawing animation */
     .check {
       fill: none;
       stroke: #33495e;
@@ -48,7 +44,6 @@
       from { stroke-dashoffset: 57; opacity: 0; }
       to   { stroke-dashoffset: 0; opacity: 1; }
     }
-    /* Loading text */
     #loading-text {
       font-family: sans-serif;
       font-size: 16px;
@@ -57,7 +52,6 @@
       text-anchor: middle;
       dominant-baseline: middle;
     }
-    /* Message styling */
     #message {
       display: none;
       font-family: sans-serif;
@@ -69,63 +63,33 @@
 </head>
 <body>
   <svg viewBox="0 0 100 100">
-    <!-- Spinner: the arc is visible and spinning initially -->
     <circle id="spinner" class="circle spinning" cx="50" cy="50" r="45" />
-    <!-- Check mark: initially hidden -->
     <path id="checkmark" class="check" d="M30 50 L45 65 L70 40" stroke-dasharray="57" stroke-dashoffset="57"/>
-    <!-- Loading text in the center -->
     <text id="loading-text" x="50" y="50">Loading...</text>
   </svg>
   <p id="message">See results below</p>
 
   <script>
-    // Function to stop the spinner, draw the check mark, display the message, and then redirect.
+    // Function to stop the animation and redirect
     function stopAnimationAndRedirect() {
-      const spinner = document.getElementById('spinner');
-      const checkmark = document.getElementById('checkmark');
-      const message = document.getElementById('message');
-      const loadingText = document.getElementById('loading-text');
-      
-      // Stop spinner rotation and optionally hide it.
-      spinner.classList.remove('spinning');
-      spinner.style.opacity = 0;
-      
-      // Hide loading text
-      loadingText.style.opacity = 0;
-      
-      // Animate the check mark drawing.
-      checkmark.style.animation = 'drawCheck 0.5s forwards';
-      
-      // After the check mark animation completes, show the message.
-      setTimeout(() => {
-        message.style.display = 'block';
-      }, 500);
-      
-      // After a further delay, redirect to your URL.
-      setTimeout(() => {
-        window.location.href = "https://your-redirect-url.com";
-      }, 3500);
+      document.getElementById('spinner').classList.remove('spinning');
+      document.getElementById('spinner').style.opacity = 0;
+      document.getElementById('loading-text').style.opacity = 0;
+      document.getElementById('checkmark').style.animation = 'drawCheck 0.5s forwards';
+      setTimeout(() => { document.getElementById('message').style.display = 'block'; }, 500);
+      setTimeout(() => { window.location.href = "https://forms.nomadbackoffice.com/xoo/form/ResumeScreener1/formperma/9jrDAuvE_11ujcnN38dd5fR7a-rwsJ7domYUw17joBg"; }, 3500);
     }
 
-    // Poll a status endpoint every few seconds until the webhook indicates "complete".
-    function pollWebhookStatus() {
-      const intervalId = setInterval(() => {
-        fetch('https://your-webhook-url.com/status')
-          .then(response => response.json())
-          .then(data => {
-            // Expecting a JSON response like { status: "complete" }
-            if (data.status === "complete") {
-              clearInterval(intervalId);
-              stopAnimationAndRedirect();
-            }
-          })
-          .catch(error => console.error("Polling error:", error));
-      }, 3000);
-    }
+    // Listen for webhook response
+    const webhookUrl = "https://hook.us1.make.com/jww4g7mnladsf1zyr5y20uyfnupjx8r5"; // Replace with your Make.com webhook URL
+    const eventSource = new EventSource(webhookUrl);
 
-    // Start polling when the page loads.
-    window.onload = function() {
-      pollWebhookStatus();
+    eventSource.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      if (data.status === "complete") {
+        eventSource.close(); // Stop listening
+        stopAnimationAndRedirect();
+      }
     };
   </script>
 </body>
