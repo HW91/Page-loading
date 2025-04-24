@@ -67,7 +67,6 @@
     <path id="checkmark" class="check" d="M30 50 L45 65 L70 40" stroke-dasharray="57" stroke-dashoffset="57"/>
     <text id="loading-text" x="50" y="50">Loading...</text>
   </svg>
-  <p id="message">Enter email below to see results</p>
 
   <script>
     let pollInterval; // Global variable for the polling interval
@@ -79,7 +78,7 @@
       document.getElementById('loading-text').style.opacity = 0;
       document.getElementById('checkmark').style.animation = 'drawCheck 0.5s forwards';
       setTimeout(() => { document.getElementById('message').style.display = 'block'; }, 500);
-      setTimeout(() => { window.location.href = "https://forms.zohopublic.com/xoo/form/ResumeScreenerDynamicFiles/formperma/pjPYaosmnAbiv52anOuMikTY1WLRcIJuHqmUfs3VlGU"; }, 3500);
+      setTimeout(() => { window.location.href = "https://forms.zohopublic.com/xoo/form/ResumeScreenerDynamicFiles/formperma/pjPYaosmnAbiv52anOuMikTY1WLRcIJuHqmUfs3VlGU"; }, 20000);
     }
 
     // Polls the status endpoint for a complete response.
