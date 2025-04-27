@@ -95,11 +95,11 @@
     }
 
     window.onload = function() {
-      // Wait 20 seconds before starting polling every 5 seconds.
+      // Wait 5 seconds before starting polling every 5 seconds.
       setTimeout(() => {
         pollStatus(); // First poll after the delay
         pollInterval = setInterval(pollStatus, 5000);
-      }, 20000);
+      }, 5000);
     }
   </script>
 </body>
